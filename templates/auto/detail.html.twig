@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PostController!{% endblock %}
+
+{% block body %}
+<tr>
+    <td>{{auto.id}}</td>
+    <td>{{auto.marque}}</td>
+    <td>{{auto.modele}}</td>
+    <td>{{auto.puissance}} CH</td>
+    <td>{{auto.prix}} €</td>
+    <td>{{auto.image}}</td>
+    <td>
+        <a href="{{asset('/auto/' ~ auto.id)}}" class="btn btn-info"><i class="fas fa-pen"></i>Détail</a>
+    </td>
+</tr>
+{% endblock %}

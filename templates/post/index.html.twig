@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PostController!{% endblock %}
+
+{% block body %}
+
+<div class="example-wrapper">
+    <h1>Post list :</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Identifiant</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Créé le</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in listPosts %}
+            <tr>
+                <td>{{post.id}}</td>
+                <td>{{post.slug}}</td>
+                <td>{{post.title}}</td>
+                <td>{{post.excerpt}}</td>
+                <td>{{post.createDate}}</td>
+                <td>
+                    <a href="{{asset('/post/' ~ post.id)}}" class="btn btn-info"><i class="fas fa-pen"></i>Détail</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+{% endblock %}

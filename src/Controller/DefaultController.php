@@ -7,40 +7,45 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController{
+class DefaultController extends AbstractController
+{
     /**
-     * @Route("/boh", name="home")
+     * @Route("/bohnot", name="homenot")
      */
-    public function index(){
+    public function index()
+    {
         return new Response("Hello world");
     }
 
     /**
-     * @Route("/aboutbis")
+     * @Route("/aboutnot")
      */
-    public function about(){
+    public function about()
+    {
         return new Response("About the site");
     }
 
-     /**
-     * @Route("/view", name="view")
+    /**
+     * @Route("/viewnot", name="viewnot")
      */
-    public function testView(){
+    public function testView()
+    {
         return $this->render("view.html.twig");
     }
 
     // /**
-    //  * @Route("/productbis/{id}", name="products", requirements={"id": "\d"})
+    //  * @Route("/productnot/{id}", name="productsnot", requirements={"id": "\d"})
     //  */
     // public function getProduct($id){
     //     return new Response("<h1>Post n°" . $id ." </h1>");
     // }
-    
+
     /**
-     * @Route("/post", name="detail")
+     * @Route("/postnot", name="detailnot")
      */
-    public function getDetail(Request $request){
-        if($request->query->get('slug')){
+    public function getDetail(Request $request)
+    {
+        if ($request->query->get('slug')) {
             // dd($request);
             $num = $request->get('slug');
             //dd($request);
@@ -48,11 +53,12 @@ class DefaultController extends AbstractController{
         }
         return new Response('<a href="/post?slug=post_detail8461517">Posts</a>');
     }
-    
+
     /**
-     * @Route("/post/{slug}", name="posts")
+     * @Route("/postnot/{slug}", name="postsnot")
      */
-    public function getPost(Request $request){
+    public function getPost(Request $request)
+    {
         $num = $request->attributes->get('slug');
         //dd($request);
         return new Response("This is the post N° " . $num);
