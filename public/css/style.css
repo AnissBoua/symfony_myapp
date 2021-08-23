@@ -20,6 +20,11 @@ header {
   padding: 1em 5em;
 }
 
+.paginator {
+  display: flex;
+  justify-content: center;
+}
+
 .nav_links {
   display: flex;
   justify-content: space-between;

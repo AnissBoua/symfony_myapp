@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+{# <form action="{{path('auto_new')}}" method="post">
+      <div class="contact_inp">
+        <label for="nom">Nom</label>
+        <input type="text" name="nom" id="nom" />
+      </div>
+      <div class="contact_inp">
+        <label for="prenom">Prenom</label>
+        <input type="text" name="prenom" id="prenom" />
+      </div>
+      <div class="contact_inp">
+        <label for="phone">Phone</label>
+        <input type="number" name="phone" id="phone" />
+      </div>
+      <div class="contact_inp">
+        <label for="adresse">Adresse</label>
+        <input type="text" name="adresse" id="adresse" />
+      </div>
+      <div class="contact_inp">
+        <label for="diplome">Diplome</label>
+        <input type="checkbox" name="diplome" id="diplome" />
+      </div>
+      <div class="contact_inp">
+        <label for="contrat">Contrat</label>
+        <input type="checkbox" name="contrat" id="contrat" />
+      </div>
+      <div class="contact_inp">
+        <label for="telephone">Telephone</label>
+        <input type="url" name="telephone" id="telephone" />
+      </div>
+      <div class="contact_inp">
+        <label for="description">Description</label>
+        <input type="text" name="description" id="description" />
+      </div>
+      <input type="submit" value="submit" name="submit" />
+    </form> #}
+
+    {# <div class="col-4 offset-1">{{ form(form_add) }}</div> #}
+
+<div class="col-6 offset-3">
+    {{form_start(form_add)}}
+    {{form_widget(form_add)}} 
+    <button class="btn btn-primary col-12">editer</button>
+    {{form_end(form_add)}}
+</div>
+
+
+{% endblock %}

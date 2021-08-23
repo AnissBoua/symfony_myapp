@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<form action="{{path('auto_new')}}" method="post">
+      <div class="contact_inp">
+        <label for="marque">Marque</label>
+        <input type="text" name="marque" id="marque" />
+      </div>
+      <div class="contact_inp">
+        <label for="modele">Modele</label>
+        <input type="text" name="modele" id="modele" />
+      </div>
+      <div class="contact_inp">
+        <label for="prix">Prix</label>
+        <input type="number" name="prix" id="prix" />
+      </div>
+      <div class="contact_inp">
+        <label for="puissance">Puissance</label>
+        <input type="number" name="puissance" id="puissance" />
+      </div>
+      <div class="contact_inp">
+        <label for="image">Image</label>
+        <input type="url" name="image" id="image" />
+      </div>
+      <div class="contact_inp">
+        <label for="pays">pays</label>
+        <input type="text" name="pays" id="pays" />
+      </div>
+      <input type="submit" value="submit" name="submit" />
+    </form>
+
+{% endblock %}

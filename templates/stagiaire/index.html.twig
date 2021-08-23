@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello StagiaireController!{% endblock %}
+
+{% block body %}
+
+<div class="example-wrapper">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Telephone</th>
+                <th>Adresse</th>
+                <th>Diplome</th>
+                <th>Contrat</th>
+                <th>Photo</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stagiaire in stagiaires %}
+            <tr>
+                <td>{{stagiaire.id}}</td>
+                <td>{{stagiaire.nom}}</td>
+                <td>{{stagiaire.prenom}}</td>
+                <td>{{stagiaire.telephone}}</td>
+                <td>{{stagiaire.adresse}}</td>
+                <td>{{stagiaire.diplome}}</td>
+                <td>{{stagiaire.contrat}}</td>
+                <td>{{stagiaire.description}}</td>
+                <td><img style="width: 5em;" src="{{ asset('' ~ stagiaire.photo)}}" alt=""></td>
+                <td>
+                    <a href="{{path('auto_item',{id:stagiaire.id})}}" class="btn btn-info"><i class="fas fa-pen"></i>Détail</a>
+                </td>
+                <td>
+                    <a onclick="return confirm('Are you sure you want to delete this car ?')" href="{{path('auto_delete',{id:stagiaire.id})}}" class="btn btn-danger"><i class="fas fa-pen"></i>Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+{% endblock %}
