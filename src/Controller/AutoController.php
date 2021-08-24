@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -122,8 +123,9 @@ class AutoController extends AbstractController
     /**
      * @Route("/auto/edit/{id}", name="auto_update")
      */
-    public function updateAuto($id): Response
+    public function updateAuto($id, Request $request): Response
     {
+        $fileSystem = new Filesystem;
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
 
@@ -132,7 +134,24 @@ class AutoController extends AbstractController
             throw $this->createNotFoundException('There are no car with this id ' . $id);
         }
 
-        return $this->render('auto/update.html.twig', ['form_update' => $form_update->createView()]);
+        $form_update->handleRequest($request);
+        if ($form_update->isSubmitted() && $form_update->isValid()) {
+            $file = $form_update->get('image')->getData();
+            $fileName = time() . '.' . $file->guessExtension();
+            $file->move($this->getParameter('images_directory'), $fileName);
+            if ($fileName) {
+                if (file_exists('img/' . $auto->getImage())) {
+                    $fileSystem->remove('img/' . $auto->getImage());
+                }
+                //$em->remove($auto);
+                $auto->setImage($fileName);
+            }
+
+            $em->flush();
+            return $this->redirectToRoute("auto", ['id' => $auto->getId()]);
+        }
+
+        return $this->render('auto/update.html.twig', ['form_update' => $form_update->createView(), 'auto' => $auto]);
 
         // $auto->setMarque('Peugeot');
         // $em->flush();
@@ -145,13 +164,16 @@ class AutoController extends AbstractController
      */
     public function deleteAuto($id): Response
     {
+        $fileSystem = new Filesystem;
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
 
         if (!$auto) {
             throw $this->createNotFoundException('There are no car with this id ' . $id);
         }
-
+        if (file_exists('img/' . $auto->getImage())) {
+            $fileSystem->remove('img/' . $auto->getImage());
+        }
         $em->remove($auto);
         $em->flush();
 

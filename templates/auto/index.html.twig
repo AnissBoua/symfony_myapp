@@ -32,6 +32,10 @@
                             class="fas fa-pen"></i>Détail</a>
                 </td>
                 <td>
+                    <a href="{{path('auto_update',{id:auto.id})}}" class="btn btn-danger"><i
+                            class="fas fa-pen"></i>Détail</a>
+                </td>
+                <td>
                     <a onclick="return confirm('Are you sure you want to delete this car ?')"
                         href="{{path('auto_delete',{id:auto.id})}}" class="btn btn-danger"><i
                             class="fas fa-pen"></i>Delete</a>

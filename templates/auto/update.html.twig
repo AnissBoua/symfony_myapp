@@ -1,25 +1,28 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 <div class="col-4 offset-4 my-4">
-<div class="row">
-   <div class="col-6">
-   {{form_start(form_update)}}
+   <div class="row">
+      <div class="col-6">
+         {{form_start(form_update)}}
 
-    {{form_label(form_update.marque)}} 
-    {{form_widget(form_update.marque)}} 
-    {{form_errors(form_update.marque)}} 
+         {{form_label(form_update.marque)}}
+         {{form_widget(form_update.marque)}}
+         {{form_errors(form_update.marque)}}
 
-    </div>
-    <div class="col-6">
-    {{form_label(form_update.modele)}} 
-    {{form_widget(form_update.modele)}} 
-    {{form_errors(form_update.modele)}} 
+      </div>
+      <div class="col-6">
+         {{form_label(form_update.modele)}}
+         {{form_widget(form_update.modele)}}
+         {{form_errors(form_update.modele)}}
 
-    </div>
-    {{form_row(form_update.puissance,{'label' : 'Puissance de votre véhicule'})}}
-   {{form_rest(form_update)}}
-   <button class="btn btn-primary col-12">editer</button>
-   {{form_end(form_update)}}
+      </div>
+      {{form_row(form_update.puissance,{'label' : 'Puissance de votre véhicule'})}}
+      {{form_rest(form_update.prix)}}
+      {{form_rest(form_update.image)}}
+      <img src="{{asset('img/' ~ auto.image)}}" class="img-thumbnail" width="100" alt="">
+      {{form_rest(form_update)}}
+      <button class="btn btn-primary col-12">editer</button>
+      {{form_end(form_update)}}
    </div>
-   </div>
+</div>
 {% endblock %}
