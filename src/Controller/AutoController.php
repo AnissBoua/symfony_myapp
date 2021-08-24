@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -27,7 +28,7 @@ class AutoController extends AbstractController
     {
         $repo = $this->getDoctrine()->getRepository(Auto::class);
         $autosData = $repo->findAll();
-        $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page',1));
+        $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page', 1));
         //dd($autos);
         return $this->render('auto/index.html.twig', [
             'autos' => $autosPagination
@@ -64,7 +65,7 @@ class AutoController extends AbstractController
      */
     public function createAuto(Request $request): Response
     {
-        if($request->request->get('puissance')){
+        if ($request->request->get('puissance')) {
             //dd($request->get('marque'));
             $em = $this->getDoctrine()->getManager();
 
@@ -82,34 +83,39 @@ class AutoController extends AbstractController
             return $this->redirectToRoute("auto");
         }
 
-        return $this->render('auto/add.html.twig', [
-        ]);
+        return $this->render('auto/add.html.twig', []);
     }
 
     /**
      * @Route("/add", name="auto_add")
      */
     public function addAuto(Request $request, EntityManagerInterface $em): Response
-    {   
+    {
         $auto = new Auto();
         $formAuto = $this->createFormBuilder($auto)
-                            ->add('marque', TextType::class, ['label'=>'marque de la viture', 'attr'=> ['placeholder'=>'entrez la marque svp']])
-                            ->add('modele')
-                            ->add('puissance')
-                            ->add('prix', MoneyType::class)
-                            ->add('pays')
-                            ->add('image', UrlType::class)
-                            ->add('submit', SubmitType::class)
-                            ->getForm();
+            ->add('marque', TextType::class, ['label' => 'marque de la viture', 'attr' => ['placeholder' => 'entrez la marque svp']])
+            ->add('modele')
+            ->add('puissance')
+            ->add('prix', MoneyType::class)
+            ->add('pays')
+            ->add('image', FileType::class)
+            ->add('submit', SubmitType::class)
+            ->getForm();
         $formAuto->handleRequest($request);
 
-        if($formAuto->isSubmitted() && $formAuto->isValid()){
+        if ($formAuto->isSubmitted() && $formAuto->isValid()) {
 
+            $file = $formAuto->get('image')->getData();
+            $fileName = time() . '.' . $file->guessExtension();
+            $file->move($this->getParameter('images_directory'), $fileName);
+            $auto->setImage($fileName);
+            // dd($file);
             $em->persist($auto);
             $em->flush();
             return $this->redirectToRoute("auto");
         }
-        return $this->render('auto/addcar.html.twig', [ 'form_car'=>$formAuto->createView(),
+        return $this->render('auto/addcar.html.twig', [
+            'form_car' => $formAuto->createView(),
         ]);
     }
 
@@ -120,13 +126,13 @@ class AutoController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
-        
+
         $form_update = $this->createForm(AutoType::class, $auto);
-        if(!$auto){
-            throw $this->createNotFoundException('There are no car with this id ' .$id);
+        if (!$auto) {
+            throw $this->createNotFoundException('There are no car with this id ' . $id);
         }
 
-        return $this->render('auto/update.html.twig', ['form_update'=>$form_update->createView()]);
+        return $this->render('auto/update.html.twig', ['form_update' => $form_update->createView()]);
 
         // $auto->setMarque('Peugeot');
         // $em->flush();
@@ -142,8 +148,8 @@ class AutoController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
 
-        if(!$auto){
-            throw $this->createNotFoundException('There are no car with this id ' .$id);
+        if (!$auto) {
+            throw $this->createNotFoundException('There are no car with this id ' . $id);
         }
 
         $em->remove($auto);

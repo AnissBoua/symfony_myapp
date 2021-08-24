@@ -26,19 +26,22 @@
                 <td>{{auto.modele}}</td>
                 <td>{{auto.puissance}} CH</td>
                 <td>{{auto.prix}} €</td>
-                <td><img style="width: 5em;" src="{{ asset('' ~ auto.image)}}" alt=""></td>
+                <td><img style="width: 5em;" src="{{ asset('img/' ~ auto.image)}}" alt=""></td>
                 <td>
-                    <a href="{{path('auto_item',{id:auto.id})}}" class="btn btn-info"><i class="fas fa-pen"></i>Détail</a>
+                    <a href="{{path('auto_item',{id:auto.id})}}" class="btn btn-info"><i
+                            class="fas fa-pen"></i>Détail</a>
                 </td>
                 <td>
-                    <a onclick="return confirm('Are you sure you want to delete this car ?')" href="{{path('auto_delete',{id:auto.id})}}" class="btn btn-danger"><i class="fas fa-pen"></i>Delete</a>
+                    <a onclick="return confirm('Are you sure you want to delete this car ?')"
+                        href="{{path('auto_delete',{id:auto.id})}}" class="btn btn-danger"><i
+                            class="fas fa-pen"></i>Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
 
     </table>
-    
+
 </div>
 <div class="paginator">{{ knp_pagination_render(autos) }}</div>
 {% endblock %}
