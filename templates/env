@@ -15,12 +15,12 @@
 
 ###> symfony/framework-bundle ###
 APP_ENV=dev
-APP_SECRET=75ab398daa38cb7a01ae5d62b7672215
+APP_SECRET=9d65ca0b4f7e20271406a2e5ff20870a
 ###< symfony/framework-bundle ###
 
 ###> symfony/mailer ###
 # MAILER_DSN=smtp://localhost
-# MAILER_DSN=sendemail://default
+#MAILER_DSN=sendmail://default
 
 ###< symfony/mailer ###
 
@@ -31,13 +31,12 @@ APP_SECRET=75ab398daa38cb7a01ae5d62b7672215
 # DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"
 # DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7"
 #DATABASE_URL="postgresql://db_user:db_password@127.0.0.1:5432/db_name?serverVersion=13&charset=utf8"
-DATABASE_URL="mysql://root:@127.0.0.1:3306/db_symfony?serverVersion=5.7"
+DATABASE_URL="mysql://root:root@127.0.0.1:3306/exo_twig?serverVersion=mariadb-10.5.8"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/google-mailer ###
 # Gmail SHOULD NOT be used on production, use it in development only.
-# MAILER_URL=gmail://anisbouainbi%40gmail.com:John0513@localhost
-# MAILER_DSN=gmail+smtp://anisbouainbi%40gmail.com:John0513@default
-MAILER_DSN=smtp://bho%40gmail.com:bho@smtp.gmail.com?verify_peer=0
+# MAILER_DSN=gmail://USERNAME:PASSWORD@default
+MAILER_DSN=gmail+smtp://mail:mdp@default
 
 ###< symfony/google-mailer ###
