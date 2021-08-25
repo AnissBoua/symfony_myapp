@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AutoRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -19,26 +20,48 @@ class Auto
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank(
+     * message = "The field {{ label }} is required"
+     * )
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your {{ label }} must be at least {{ limit }} characters long",
+     *      maxMessage = "Your {{ label }} cannot be longer than {{ limit }} characters"
+     * )
      */
     private $marque;
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank(
+     * message = "The field {{ label }} is required"
+     * )
      */
     private $modele;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank(
+     * message = "The field {{ label }} is required"
+     * )
+     * @Assert\Positive
      */
     private $puissance;
 
     /**
      * @ORM\Column(type="float")
+     * @Assert\NotBlank(
+     * message = "The field {{ label }} is required"
+     * )
      */
     private $prix;
 
     /**
      * @ORM\Column(type="string", length=20)
+     * @Assert\NotBlank(
+     * message = "The field {{ label }} is required"
+     * )
      */
     private $pays;
 

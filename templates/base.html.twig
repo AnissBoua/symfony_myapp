@@ -33,6 +33,10 @@
       </ul>
     </nav>
   </header>
+  {% for message in app.flashes('success')%}
+  {{message}}
+  {% endfor %}
+
   {% block body %}{% endblock %}
 </body>
 

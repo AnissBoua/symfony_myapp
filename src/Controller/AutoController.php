@@ -4,30 +4,39 @@ namespace App\Controller;
 
 use App\Entity\Auto;
 use App\Form\AutoType;
+use App\Form\ContactType;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use App\Service\AutoService;
 use App\Repository\AutoRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Knp\Component\Pager\PaginatorInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AutoController extends AbstractController
 {
     /**
      * @Route("/auto", name="auto")
      */
-    public function index(PaginatorInterface $paginator, Request $request): Response
+    public function index(PaginatorInterface $paginator, Request $request, SessionInterface $session): Response
     {
         $repo = $this->getDoctrine()->getRepository(Auto::class);
+
+        $cars = $repo->findBy(['puissance'=>501], ['id'=>'DESC']);
+        $session->set('cars', $cars);
+        
         $autosData = $repo->findAll();
         $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page', 1));
         //dd($autos);
@@ -90,7 +99,7 @@ class AutoController extends AbstractController
     /**
      * @Route("/add", name="auto_add")
      */
-    public function addAuto(Request $request, EntityManagerInterface $em): Response
+    public function addAuto(Request $request, EntityManagerInterface $em, AutoService $autoService): Response
     {
         $auto = new Auto();
         $formAuto = $this->createFormBuilder($auto)
@@ -105,14 +114,16 @@ class AutoController extends AbstractController
         $formAuto->handleRequest($request);
 
         if ($formAuto->isSubmitted() && $formAuto->isValid()) {
-
-            $file = $formAuto->get('image')->getData();
-            $fileName = time() . '.' . $file->guessExtension();
-            $file->move($this->getParameter('images_directory'), $fileName);
+            $image_directory = $this->getParameter('images_directory');
+            $fileName = $autoService->uploadImage($formAuto, $image_directory);
+            // $file = $formAuto->get('image')->getData();
+            // $fileName = time() . '.' . $file->guessExtension();
+            // $file->move($this->getParameter('images_directory'), $fileName);
             $auto->setImage($fileName);
             // dd($file);
             $em->persist($auto);
             $em->flush();
+            $this->addFlash('success', 'Car added succesfully');
             return $this->redirectToRoute("auto");
         }
         return $this->render('auto/addcar.html.twig', [
@@ -125,7 +136,7 @@ class AutoController extends AbstractController
      */
     public function updateAuto($id, Request $request): Response
     {
-        $fileSystem = new Filesystem;
+        
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
 
@@ -133,18 +144,25 @@ class AutoController extends AbstractController
         if (!$auto) {
             throw $this->createNotFoundException('There are no car with this id ' . $id);
         }
-
+        $oldFileName = $auto->getImage();
         $form_update->handleRequest($request);
         if ($form_update->isSubmitted() && $form_update->isValid()) {
+            $fileSystem = new Filesystem;
             $file = $form_update->get('image')->getData();
-            $fileName = time() . '.' . $file->guessExtension();
-            $file->move($this->getParameter('images_directory'), $fileName);
-            if ($fileName) {
-                if (file_exists('img/' . $auto->getImage())) {
-                    $fileSystem->remove('img/' . $auto->getImage());
+            //$fileName = time() . '.' . $file->guessExtension();
+            $fileName = "";
+            if ($file) {
+                $fileName = time() . '.' . $file->guessExtension();
+                $file->move($this->getParameter('images_directory'), $fileName);
+                if (file_exists('img/' . $oldFileName)) {
+                    
+                    $fileSystem->remove('img/' . $oldFileName);
+                    
                 }
                 //$em->remove($auto);
                 $auto->setImage($fileName);
+            }else{
+                $auto->setImage($oldFileName);
             }
 
             $em->flush();
@@ -178,5 +196,38 @@ class AutoController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('auto');
+    }
+
+    /**
+     * @Route("/sendmail", name="sendmail")
+     */
+    public function sendMail()
+    {
+        $form_contact = $this->createForm(ContactType::class);
+
+        return $this->render('auto/contact.html.twig', ['formContact'=>$form_contact->createView()]);
+        # code...
+    }
+
+    /**
+     * @Route("/email", name="testmail")
+     */
+    public function Email(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('anisbouainbi@gmail.com')
+            ->to('anisbouainbi@gmail.com')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
+        
+        return new Response('the email have been sent');
+        
     }
 }
