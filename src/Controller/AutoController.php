@@ -12,6 +12,7 @@ use App\Repository\AutoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,17 +33,30 @@ class AutoController extends AbstractController
      */
     public function index(PaginatorInterface $paginator, Request $request, SessionInterface $session): Response
     {
+        dd($request->get('search'));
         $repo = $this->getDoctrine()->getRepository(Auto::class);
 
-        $cars = $repo->findBy(['puissance'=>501], ['id'=>'DESC']);
+        $cars = $repo->findBy(['puissance' => 501], ['id' => 'DESC']);
         $session->set('cars', $cars);
-        
+
         $autosData = $repo->findAll();
         $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page', 1));
         //dd($autos);
         return $this->render('auto/index.html.twig', [
             'autos' => $autosPagination
         ]);
+    }
+
+    /**
+     * @Route("/expCars", name="expCars")
+     */
+    public function expensiveAuto(AutoRepository $repo): Response
+    {
+
+        $expCars = $repo->findAllGreaterThanPrice3(70000);
+
+        dd($expCars);
+        return $this->render('auto/index.html.twig');
     }
 
     /**
@@ -136,7 +150,7 @@ class AutoController extends AbstractController
      */
     public function updateAuto($id, Request $request): Response
     {
-        
+
         $em = $this->getDoctrine()->getManager();
         $auto = $em->getRepository(Auto::class)->find($id);
 
@@ -155,13 +169,12 @@ class AutoController extends AbstractController
                 $fileName = time() . '.' . $file->guessExtension();
                 $file->move($this->getParameter('images_directory'), $fileName);
                 if (file_exists('img/' . $oldFileName)) {
-                    
+
                     $fileSystem->remove('img/' . $oldFileName);
-                    
                 }
                 //$em->remove($auto);
                 $auto->setImage($fileName);
-            }else{
+            } else {
                 $auto->setImage($oldFileName);
             }
 
@@ -198,16 +211,6 @@ class AutoController extends AbstractController
         return $this->redirectToRoute('auto');
     }
 
-    /**
-     * @Route("/sendmail", name="sendmail")
-     */
-    public function sendMail()
-    {
-        $form_contact = $this->createForm(ContactType::class);
-
-        return $this->render('auto/contact.html.twig', ['formContact'=>$form_contact->createView()]);
-        # code...
-    }
 
     /**
      * @Route("/email", name="testmail")
@@ -226,8 +229,42 @@ class AutoController extends AbstractController
             ->html('<p>See Twig integration for better HTML integration!</p>');
 
         $mailer->send($email);
-        
+
         return new Response('the email have been sent');
-        
+    }
+
+    /**
+     * @Route("/sendmail", name="sendmail")
+     */
+    public function sendMail(Request $request, MailerInterface $mailer)
+    {
+        $form_contact = $this->createForm(ContactType::class);
+        $form_contact->handleRequest($request);
+        if ($form_contact->isSubmitted() && $form_contact->isValid()) {
+            $contact = $form_contact->getData();
+            //dd($contact);
+
+            $email = (new TemplatedEmail())
+                ->from($contact['email'])
+                ->to('anisbouainbi@gmail.com')
+                ->subject($contact['object'])
+                ->htmlTemplate('emails/message.html.twig')
+                ->context(['contact' => $contact]);
+
+            $mailer->send($email);
+            return $this->redirectToRoute('confirm_email');
+        }
+        return $this->render('auto/contact.html.twig', ['formContact' => $form_contact->createView()]);
+        # code...
+    }
+
+    /**
+     * @Route("/confirm_email", name="confirm_email")
+     */
+    public function confirmMail()
+    {
+
+        return $this->render('emails/confirmemail.html.twig');
+        # code...
     }
 }
