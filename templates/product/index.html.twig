@@ -1,21 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-Hello ProductController!
+Posts
 {% endblock %}
 
 {% block body %}
 <section class="post_section">
+<div class="row row-cols-1 row-cols-md-4 g-4">
   {% for post in posts %}
-  <div class="post_card">
-    <img class="post_img" src="{{asset('img/' ~ post.image)}}" alt="{{ post.image }}" />
-    <div class="post_info">
-      <h3 class="post_title">{{ post.title }}</h3>
-      <p class="post_desc">{{ post.description }}</p>
-      <p class="post_date">{{ post.date_parution }}</p>
-    </div>
+  <div class="col align-middle p-0">
+  <div class="card h-100 m-2" style="width: 18rem;">
+  <img src="{{asset('img/' ~ post.image)}}" class="card-img-top h-50" alt="{{ post.image }}">
+  <div class="card-body">
+    <h5 class="card-title">{{ post.title }}</h5>
+    <p class="post_date"><small class="text-muted">{{ post.date_parution }}</small></p>
+    <p class="card-text">{{ post.description }}</p>
   </div>
+</div>
+</div>
   {% endfor %}
+</div>
 </section>
 
 {% endblock %}

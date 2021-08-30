@@ -4,23 +4,27 @@ namespace App\Controller;
 
 use App\Entity\Auto;
 use App\Form\AutoType;
+use App\Entity\Category;
 use App\Form\ContactType;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use App\Service\AutoService;
+use Symfony\Component\Mime\Email;
 use App\Repository\AutoRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -28,20 +32,37 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AutoController extends AbstractController
 {
+    private $session;
+
+    public function __construct()
+    {
+        
+    }
+
     /**
      * @Route("/auto", name="auto")
      */
-    public function index(PaginatorInterface $paginator, Request $request, SessionInterface $session): Response
+    public function index(PaginatorInterface $paginator, Request $request, SessionInterface $session, AutoRepository $autoRepo): Response
     {
-        dd($request->get('search'));
+        //dd($request->get('search'));
         $repo = $this->getDoctrine()->getRepository(Auto::class);
 
         $cars = $repo->findBy(['puissance' => 501], ['id' => 'DESC']);
+
         $session->set('cars', $cars);
 
         $autosData = $repo->findAll();
+        $search = $request->get('search');
+
+        $searchAuto = $autoRepo->searchAuto($search);
         $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page', 1));
-        //dd($autos);
+        //dd($autosData);
+
+        if($searchAuto != null){
+            $autosPagination = $paginator->paginate($searchAuto, $request->query->getInt('page', 1));
+        }
+        
+        
         return $this->render('auto/index.html.twig', [
             'autos' => $autosPagination
         ]);
@@ -113,12 +134,18 @@ class AutoController extends AbstractController
     /**
      * @Route("/add", name="auto_add")
      */
-    public function addAuto(Request $request, EntityManagerInterface $em, AutoService $autoService): Response
+    public function addAuto(Request $request, EntityManagerInterface $em, AutoService $autoService, CategoryRepository $categoryRepo): Response
     {
+        $cRepo = $em->getRepository(Category::class);
+        $allcategory = $categoryRepo->findAll();
         $auto = new Auto();
         $formAuto = $this->createFormBuilder($auto)
             ->add('marque', TextType::class, ['label' => 'marque de la viture', 'attr' => ['placeholder' => 'entrez la marque svp']])
             ->add('modele')
+            // ->add('category', ChoiceType::class, ['choices'  => $allcategory, 'choice_label' => function(?Category $category) {
+            //     return $category ? $category->getName() : '';
+            // },])
+            ->add('category', EntityType::class, ['class'=>Category::class, 'placeholder' => 'Choice a category', 'choice_label'=>'name'])
             ->add('puissance')
             ->add('prix', MoneyType::class)
             ->add('pays')

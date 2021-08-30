@@ -59,26 +59,41 @@ class AutoRepository extends ServiceEntityRepository
         # code...
     }
 
-    public function findAllGreaterThanPrice2($price)
-    {
-        $em = $this->getEntityManager();
-        $q = $em->createQuery(
-            'SELECT a
-            FROM App\Entity\Auto a
-            WHERE a.prix > :p'
-        )
-            ->setParameter('p', $price);
-        return $q->getResult();
-    }
+    // public function findAllGreaterThanPrice2($price)
+    // {
+    //     $em = $this->getEntityManager();
+    //     $q = $em->createQuery(
+    //         'SELECT a
+    //         FROM App\Entity\Auto a
+    //         WHERE a.prix > :p'
+    //     )
+    //         ->setParameter('p', $price);
+    //     return $q->getResult();
+    // }
 
-    public function findAllGreaterThanPrice3($price)
+    // public function findAllGreaterThanPrice3($price)
+    // {
+    //     $db = $this->getEntityManager()->getConnection();
+    //     $r = '
+    //         SELECT * FROM Auto a
+    //         WHERE a.prix > :p';
+    //     $result = $db->prepare($r);
+    //     $result->execute(['p' => $price]);
+    //     return $result->fetchAllAssociative();
+    // }
+
+    public function searchAuto($search)
     {
-        $db = $this->getEntityManager()->getConnection();
-        $r = '
-            SELECT * FROM Auto a
-            WHERE a.prix > :p';
-        $result = $db->prepare($r);
-        $result->execute(['p' => $price]);
-        return $result->fetchAllAssociative();
+        if($search){
+            return $this->createQueryBuilder('a')
+            ->andWhere('a.marque LIKE :search OR a.modele LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('a.prix', 'DESC')
+            ->getQuery()
+            ->getResult();
+        # code...
+        }
+        
     }
+    
 }
