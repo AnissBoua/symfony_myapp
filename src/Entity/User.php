@@ -48,6 +48,11 @@ class User implements UserInterface
      */
     private $confirmPassword;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $roles;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,7 +96,7 @@ class User implements UserInterface
 
     /**
      * Get the value of confirmPassword
-     */ 
+     */
     public function getConfirmPassword()
     {
         return $this->confirmPassword;
@@ -101,7 +106,7 @@ class User implements UserInterface
      * Set the value of confirmPassword
      *
      * @return  self
-     */ 
+     */
     public function setConfirmPassword($confirmPassword)
     {
         $this->confirmPassword = $confirmPassword;
@@ -111,26 +116,30 @@ class User implements UserInterface
 
     public function eraseCredentials()
     {
-        
     }
 
     public function getSalt()
     {
-        
     }
 
     public function getRoles()
     {
-        return ['ROLE_USER'];
+        return [$this->roles];
     }
 
     public function getUserIdentifier()
     {
-        
+        return $this->name;
     }
 
     public function getUsername()
     {
-        
+    }
+
+    public function setRoles(?string $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 }

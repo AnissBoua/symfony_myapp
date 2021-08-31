@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * @Route("/user")
@@ -40,7 +41,8 @@ class UserController extends AbstractController
             // $passEncode = $encoder->encodePassword($user, $user->getPassword());
             // $user->setPassword($passEncode);
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-            
+
+            $user->setRoles('ROLE_USER');
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
@@ -57,14 +59,24 @@ class UserController extends AbstractController
     /**
      * @Route("/login", name="login")
      */
-    public function login(){
-        return $this->render('user/login.html.twig');
+    public function login(AuthenticationUtils $authenticationUtils)
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUser = $authenticationUtils->getLastUsername();
+        return $this->render('user/login.html.twig', ['error' => $error, 'last_user' => $lastUser]);
+    }
+
+    /**
+     * @Route("/logout", name="logout")
+     */
+    public function logout()
+    {
     }
 
     /**
      * @Route("/{id}", name="user_show", methods={"GET"})
      */
-    public function show(UserRepository $userRepo,$id): Response
+    public function show(UserRepository $userRepo, $id): Response
     {
         $user = $userRepo->find($id);
         return $this->render('user/show.html.twig', [
@@ -99,7 +111,7 @@ class UserController extends AbstractController
     public function delete(Request $request, UserRepository $userRepo, $id): Response
     {
         $user = $userRepo->find($id);
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($user);
             $entityManager->flush();
@@ -107,5 +119,4 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute('user_index', [], Response::HTTP_SEE_OTHER);
     }
-
 }

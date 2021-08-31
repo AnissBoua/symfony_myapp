@@ -1,10 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+{% if error %}
+<div class="alert-danger">
+  <strong>{{error.messageKey|trans(error.messageData, 'security') }}</strong>
+</div>
+{% endif %}
 <form action="{{path('login')}}" method="post">
   <div class="mb-3">
     <label for="email" class="form-label">Email address</label>
-    <input type="text" class="form-control" name="_username" id="email" aria-describedby="emailHelp">
+    <input type="email" class="form-control" name="_username" id="email" value="{{last_user}}"
+      aria-describedby="emailHelp">
     <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
   </div>
   <div class="mb-3">
@@ -13,6 +19,6 @@
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-    
+
 
 {% endblock %}

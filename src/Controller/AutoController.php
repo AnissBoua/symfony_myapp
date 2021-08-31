@@ -13,13 +13,13 @@ use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,6 +28,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AutoController extends AbstractController
@@ -36,7 +37,6 @@ class AutoController extends AbstractController
 
     public function __construct()
     {
-        
     }
 
     /**
@@ -58,11 +58,11 @@ class AutoController extends AbstractController
         $autosPagination = $paginator->paginate($autosData, $request->query->getInt('page', 1));
         //dd($autosData);
 
-        if($searchAuto != null){
+        if ($searchAuto != null) {
             $autosPagination = $paginator->paginate($searchAuto, $request->query->getInt('page', 1));
         }
-        
-        
+
+
         return $this->render('auto/index.html.twig', [
             'autos' => $autosPagination
         ]);
@@ -132,10 +132,12 @@ class AutoController extends AbstractController
     }
 
     /**
+     * @IsGranted("ROLE_ADMIN")
      * @Route("/add", name="auto_add")
      */
     public function addAuto(Request $request, EntityManagerInterface $em, AutoService $autoService, CategoryRepository $categoryRepo): Response
     {
+        // $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $cRepo = $em->getRepository(Category::class);
         $allcategory = $categoryRepo->findAll();
         $auto = new Auto();
@@ -145,7 +147,7 @@ class AutoController extends AbstractController
             // ->add('category', ChoiceType::class, ['choices'  => $allcategory, 'choice_label' => function(?Category $category) {
             //     return $category ? $category->getName() : '';
             // },])
-            ->add('category', EntityType::class, ['class'=>Category::class, 'placeholder' => 'Choice a category', 'choice_label'=>'name'])
+            ->add('category', EntityType::class, ['class' => Category::class, 'placeholder' => 'Choice a category', 'choice_label' => 'name'])
             ->add('puissance')
             ->add('prix', MoneyType::class)
             ->add('pays')
