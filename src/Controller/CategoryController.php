@@ -11,6 +11,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -107,5 +108,12 @@ class CategoryController extends AbstractController
         $autosPagination = $paginator->paginate($autos, $request->query->getInt('page', 1));
 
         return $this->render('category/autos.html.twig', ['autos'=>$autosPagination]);
+    }
+
+    public function getAllCategories(CategoryRepository $repo, SessionInterface $session){
+        $categories = $repo->findAll();
+        $session->set('category', $categories);
+
+        return new Response('');
     }
 }

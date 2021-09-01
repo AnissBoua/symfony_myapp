@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
-use App\Model\Driver;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Driver;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PostController extends AbstractController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Entity;
 
 use App\Entity\Post;
 use Symfony\Component\Validator\Constraints\Date;
@@ -35,4 +35,7 @@ class Driver
         array_push($posts, $post1, $post2, $post3);
         return $posts;
     }
+
+    
+
 }
